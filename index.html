@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Notes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="orbs" aria-hidden="true">
+        <span class="orb orb-a"></span>
+        <span class="orb orb-b"></span>
+        <span class="orb orb-c"></span>
+    </div>
+
+    <nav class="themes">
+        <button class="theme" data-theme="light">Clair</button>
+        <button class="theme active" data-theme="dark">Sombre</button>
+        <button class="theme" data-theme="ocean">Océan</button>
+        <button class="theme" data-theme="forest">Forêt</button>
+        <button class="theme" data-theme="sunset">Coucher</button>
+    </nav>
+
+    <input type="file" id="import-file" accept=".json" hidden>
+
+    <div class="page">
+
+        <div class="action-bar">
+            <button class="btn-action btn-ghost" id="btn-export-json">📤 Exporter JSON</button>
+            <button class="btn-action btn-ghost" id="btn-import-json">📥 Importer JSON</button>
+            <button class="btn-action btn-solid" id="btn-pdf">📄 PDF</button>
+            <button class="btn-action btn-solid" id="btn-png">🖼 PNG</button>
+        </div>
+
+        <article class="card" id="capture">
+
+            <header class="card-header">
+                <p class="site-label">Calculateur de Notes</p>
+                <div class="avg-display">
+                    <span class="avg-num" id="avg-num">—</span>
+                    <span class="avg-denom">/20</span>
+                </div>
+                <p class="mention" id="mention">Aucune note saisie</p>
+                <div class="bar-track">
+                    <div class="bar-fill" id="bar-fill"></div>
+                </div>
+            </header>
+
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="th-drag"></th>
+                            <th>Matière</th>
+                            <th>Note</th>
+                            <th>Coefficient</th>
+                            <th class="th-del"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+
+            <button class="btn-add" id="btn-add">
+                <span class="btn-add-icon" aria-hidden="true">+</span>
+                Ajouter une matière
+            </button>
+
+        </article>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

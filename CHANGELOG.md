@@ -1,0 +1,13 @@
+- JSON export/import pour partager et réimporter les notes
+- champ "note sur X" configurable par ligne (normalise automatiquement sur /20)
+- glisser-déposer pour réordonner les lignes
+- nouvelle ligne ajoutée automatiquement quand la dernière ligne est remplie
+- boutons d'action déplacés au-dessus du résultat
+- default theme changed to dark
+- light theme accent updated from purple to navy/blue
+- created grade calculator (HTML/CSS/JS)
+- weighted average calculation with subject names, grades and coefficients
+- animated count-up average display with progress bar and mention
+- export to PDF and PNG via html2canvas + jsPDF
+- 5 themes: Clair, Sombre, Océan, Forêt, Coucher — persisted in localStorage
+- animated background orbs, row slide-in/out, button ripple, input focus glow
