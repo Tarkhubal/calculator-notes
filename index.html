@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculateur de Notes</title>
+    <meta name="version" content="1.3.0">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -31,6 +32,19 @@
             <button class="btn-action btn-ghost" id="btn-import-json">📥 Importer JSON</button>
             <button class="btn-action btn-solid" id="btn-pdf">📄 PDF</button>
             <button class="btn-action btn-solid" id="btn-png">🖼 PNG</button>
+        </div>
+
+        <div class="sessions-bar" id="sessions-bar">
+            <input class="session-name-inp" id="session-name" type="text"
+                   placeholder="Nom de la liste…" maxlength="40" autocomplete="off">
+            <span class="save-indicator" id="save-indicator">Sauvegardé ✓</span>
+            <button class="btn-sess-toggle" id="btn-sess-toggle">
+                <span class="sess-arrow" aria-hidden="true">▾</span> Mes listes
+            </button>
+            <button class="btn-sess-new" id="btn-sess-new">+ Nouvelle liste</button>
+            <div class="sessions-panel" id="sessions-panel">
+                <ul id="sessions-list"></ul>
+            </div>
         </div>
 
         <article class="card" id="capture">

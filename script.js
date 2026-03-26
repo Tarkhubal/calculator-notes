@@ -128,6 +128,7 @@ function recalc() {
         avgEl.textContent = '—';
         mentionEl.textContent = 'Aucune note saisie';
         barFill.style.width = '0%';
+        if (!importing) scheduleSave();
         return;
     }
 
@@ -135,6 +136,7 @@ function recalc() {
     animateAvg(avg);
     barFill.style.width = `${(avg / 20) * 100}%`;
     mentionEl.textContent = getMention(avg);
+    if (!importing) scheduleSave();
 }
 
 function getMention(avg) {
@@ -339,8 +341,168 @@ document.getElementById('btn-pdf').addEventListener('click', async () => {
 
 document.getElementById('btn-add').addEventListener('click', createRow);
 
+// ===== sessions / localStorage =====
+
+const STORAGE_KEY = 'calc_notes_v1';
+let sessions = [];
+let activeId = null;
+let saveTimer = null;
+
+function genId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function readStorage() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); }
+    catch { return null; }
+}
+
+function persist() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lists: sessions, activeId }));
+}
+
+function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveCurrentList, 800);
+}
+
+function saveCurrentList() {
+    if (!activeId) return;
+    const s = sessions.find(s => s.id === activeId);
+    if (!s) return;
+    s.name = document.getElementById('session-name').value.trim() || 'Sans titre';
+    s.notes = getRowData();
+    persist();
+    flashSaveIndicator();
+}
+
+function flashSaveIndicator() {
+    const el = document.getElementById('save-indicator');
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+}
+
+function newSession(name = 'Nouvelle liste') {
+    const s = { id: genId(), name, notes: [] };
+    sessions.push(s);
+    return s;
+}
+
+// loads a session into the DOM without saving current first
+function loadSession(id) {
+    const s = sessions.find(s => s.id === id);
+    if (!s) return;
+    activeId = id;
+    document.getElementById('session-name').value = s.name;
+    importing = true;
+    tbody.innerHTML = '';
+    currentAvg = null;
+    if (s.notes.length > 0) {
+        s.notes.forEach(row => createRow(row));
+    } else {
+        createRow(); createRow(); createRow();
+    }
+    importing = false;
+    recalc();
+    persist();
+    renderSessionsList();
+}
+
+// saves current then loads another
+function switchToSession(id) {
+    if (id === activeId) return;
+    saveCurrentList();
+    loadSession(id);
+}
+
+function deleteSession(id) {
+    if (sessions.length <= 1) return;
+    sessions = sessions.filter(s => s.id !== id);
+    if (activeId === id) {
+        loadSession(sessions[0].id);
+    } else {
+        persist();
+        renderSessionsList();
+    }
+}
+
+function renderSessionsList() {
+    const ul = document.getElementById('sessions-list');
+    ul.innerHTML = '';
+    sessions.forEach((s, i) => {
+        const filled = s.notes.filter(n => (n.subject || '').trim() || (n.grade || '').trim()).length;
+        const li = document.createElement('li');
+        li.className = `session-item${s.id === activeId ? ' active' : ''}`;
+        li.innerHTML = `
+            <span class="session-item-name">${s.name}</span>
+            <span class="session-item-count">${filled} matière${filled !== 1 ? 's' : ''}</span>
+            <button class="btn-session-del"${sessions.length === 1 ? ' disabled' : ''} title="Supprimer">×</button>
+        `;
+        li.addEventListener('click', e => {
+            if (e.target.closest('.btn-session-del')) return;
+            switchToSession(s.id);
+            closePanel();
+        });
+        li.querySelector('.btn-session-del').addEventListener('click', e => {
+            e.stopPropagation();
+            deleteSession(s.id);
+        });
+        ul.appendChild(li);
+    });
+}
+
+const panel    = document.getElementById('sessions-panel');
+const togBtn   = document.getElementById('btn-sess-toggle');
+const sessBar  = document.getElementById('sessions-bar');
+
+function openPanel() {
+    saveCurrentList();
+    renderSessionsList();
+    panel.classList.add('open');
+    togBtn.classList.add('open');
+}
+
+function closePanel() {
+    panel.classList.remove('open');
+    togBtn.classList.remove('open');
+}
+
+togBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    panel.classList.contains('open') ? closePanel() : openPanel();
+});
+
+document.addEventListener('click', e => {
+    if (!sessBar.contains(e.target)) closePanel();
+});
+
+document.getElementById('btn-sess-new').addEventListener('click', () => {
+    saveCurrentList();
+    const s = newSession();
+    loadSession(s.id);
+    closePanel();
+    setTimeout(() => {
+        const inp = document.getElementById('session-name');
+        inp.select();
+        inp.focus();
+    }, 60);
+});
+
+document.getElementById('session-name').addEventListener('input', scheduleSave);
+
 // ===== init =====
 
-createRow();
-createRow();
-createRow();
+(function initSessions() {
+    const stored = readStorage();
+    if (stored && Array.isArray(stored.lists) && stored.lists.length > 0) {
+        sessions = stored.lists;
+        const id = stored.activeId && sessions.find(s => s.id === stored.activeId)
+            ? stored.activeId
+            : sessions[0].id;
+        loadSession(id);
+    } else {
+        const s = newSession('Mes notes');
+        loadSession(s.id);
+    }
+}());

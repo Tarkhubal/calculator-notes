@@ -1,2 +1,4 @@
-- layout mobile du tableau repensé : matière sur ligne 1, note/coefficient sur ligne 2
-- export PNG/PDF corrigé sur mobile (theme, scroll, devicePixelRatio)
+- auto-save to localStorage (800ms debounce)
+- multi-list history: create, rename, switch and delete note lists
+- animated "Saved ✓" indicator after each save
+- version meta tag in HTML
