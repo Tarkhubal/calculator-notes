@@ -267,15 +267,32 @@ function hideUIControls(hidden) {
 }
 
 async function captureArea() {
+    const el = document.getElementById('capture');
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    // resolved bg color (getComputedStyle resolves CSS vars)
+    const bgColor = window.getComputedStyle(el).backgroundColor;
+    // scroll to top so html2canvas finds the element at the right position
+    const prevScrollY = window.scrollY;
+    window.scrollTo(0, 0);
     hideUIControls(true);
-    const canvas = await html2canvas(document.getElementById('capture'), {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: null,
-    });
-    hideUIControls(false);
-    return canvas;
+    try {
+        return await html2canvas(el, {
+            scale: Math.min(window.devicePixelRatio || 1, 2),
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            backgroundColor: bgColor || '#161b22',
+            scrollX: 0,
+            scrollY: 0,
+            // preserve theme on the cloned doc so CSS vars resolve correctly
+            onclone: (clonedDoc) => {
+                clonedDoc.documentElement.setAttribute('data-theme', theme);
+            },
+        });
+    } finally {
+        hideUIControls(false);
+        window.scrollTo(0, prevScrollY);
+    }
 }
 
 // ===== export PNG =====
