@@ -1,4 +1,0 @@
-- auto-save to localStorage (800ms debounce)
-- multi-list history: create, rename, switch and delete note lists
-- animated "Saved ✓" indicator after each save
-- version meta tag in HTML

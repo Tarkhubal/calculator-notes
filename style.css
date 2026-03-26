@@ -724,6 +724,7 @@ tr.dragging .drag-handle {
     padding: 10px 14px;
     box-shadow: var(--sh);
     position: relative;
+    z-index: 10;
     flex-wrap: wrap;
     transition: background .5s, box-shadow .5s;
     animation: pageUp .65s cubic-bezier(.34, 1.2, .64, 1) .15s both;
